@@ -18,6 +18,7 @@ public class BongBauDuc_Bot : MonoBehaviour
         options = new GameObject[BongBauDuc_GameManager.ins.locations.Length];
         agent = GetComponent<NavMeshAgent>();
         botAnimator = GetComponent<Animator>();
+        targetPoint = transform.position;
     }
 
     private void Update()
@@ -38,52 +39,56 @@ public class BongBauDuc_Bot : MonoBehaviour
     {
         // yield return new WaitForSeconds(0.5f + Random.Range(0.0f, 0.5f));
         yield return new WaitForSeconds(0.5f);
-        for(int i = 0; i < options.Length; i++)
+        if(isDie == false)
         {
-            options[i] = null;
-        }
-
-        for(int i = 0; i < options.Length; i++)
-        {
-            if(BongBauDuc_GameManager.ins.locationAlive[i] == true)
+            for(int i = 0; i < options.Length; i++)
             {
-                options[i] = BongBauDuc_GameManager.ins.locations[i];
+                options[i] = null;
             }
-        }
 
-        // int ran;
-        // do
-        // {
-        //     ran = Random.Range(0, 25);
-        // } while(options[ran] == null);
-        if(Random.Range(0, 6) != 2)
-        {
-            float min = 100;
-            for(int i = 0; i < 25; i++)
+            for(int i = 0; i < options.Length; i++)
             {
-                if(options[i] == null) continue;
-                float dis = Vector3.Distance(transform.position, options[i].transform.position);
-                if(dis < min)
+                if(BongBauDuc_GameManager.ins.locationAlive[i] == true)
                 {
-                    targetPoint = new Vector3(options[i].transform.position.x, 0, options[i].transform.position.z);
-                    min = dis;
+                    options[i] = BongBauDuc_GameManager.ins.locations[i];
                 }
             }
-        }
-        else
-        {
-            int ran = Random.Range(0, 25);
-            targetPoint = new Vector3(BongBauDuc_GameManager.ins.locations[ran].transform.position.x, 0, BongBauDuc_GameManager.ins.locations[ran].transform.position.z);
-        }
 
-        
-        agent.SetDestination(targetPoint);
+            // int ran;
+            // do
+            // {
+            //     ran = Random.Range(0, 25);
+            // } while(options[ran] == null);
+            if(Random.Range(0, 6) != 2)
+            {
+                float min = 100;
+                for(int i = 0; i < 25; i++)
+                {
+                    if(options[i] == null) continue;
+                    float dis = Vector3.Distance(transform.position, options[i].transform.position);
+                    if(dis < min)
+                    {
+                        targetPoint = new Vector3(options[i].transform.position.x, 0, options[i].transform.position.z);
+                        min = dis;
+                    }
+                }
+            }
+            else
+            {
+                int ran = Random.Range(0, 25);
+                targetPoint = new Vector3(BongBauDuc_GameManager.ins.locations[ran].transform.position.x, 0, BongBauDuc_GameManager.ins.locations[ran].transform.position.z);
+            }
+            Debug.Log(targetPoint);
+            
+            agent.SetDestination(targetPoint);
+        }
     }
 
     public IEnumerator BotWin()
     {
         yield return new WaitForSeconds(Random.Range(0.0f, 0.3f));
-        botAnimator.SetBool("isWin", true);
+        if(isDie == false)
+            botAnimator.SetBool("isWin", true);
     }
 
     private void OnCollisionEnter(Collision other)
